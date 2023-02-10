@@ -37,7 +37,7 @@ end
 
 --- Formats the input string with the given delimiters at specific ranges.
 ---@param input string: the input string to be formatted.
----@param ranges table: array of ranges in the form of `{start_pos, end_pos}`. The delimiters will be inserted at these ranges.
+---@param ranges table: array of ranges in the form of `{start_pos, end_pos}`.
 ---@param delimiters string: the string to be used as the delimiters.
 ---@return string: formatted string with the delimiters inserted at the specified ranges.
 M.format_with_delimiters = function(input, ranges, delimiters)
@@ -115,7 +115,7 @@ end
 --- Replaces a range of characters in the given input string or table of strings
 -- @param input (string or table<string>) the input string or table of strings to replace characters in
 -- @param replacement (string) the replacement string
--- @param range (table<number, number, number, number>) the start and end indices of the range to replace, given as a table of four numbers representing start_row, start_col, end_row, end_col
+-- @param range (table<number, number, number, number>) the start and end indices of the range to replace
 -- @return (string or table<string>) the input with the specified range replaced
 function M.replace_range(input, replacement, range)
     local start_row, start_col, end_row, end_col = unpack(range)

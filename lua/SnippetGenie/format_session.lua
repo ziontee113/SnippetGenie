@@ -51,6 +51,21 @@ function M.FormatSession:produce_snippet_body()
     return snippet_body
 end
 
+function M.FormatSession:produce_snippet_nodes()
+    local snippet_nodes = {}
+
+    for i, hole in ipairs(self.holes) do
+        table.insert(snippet_nodes, string.format('i(%s, "%s")', i, hole.content))
+    end
+
+    return snippet_nodes
+end
+
+function M.FormatSession:produce_final_snippet()
+    local snippet_body = self:produce_snippet_body()
+    local snippet_nodes = self:produce_snippet_nodes()
+end
+
 function M.FormatSession.new()
     local session = vim.deepcopy(M.FormatSession)
 

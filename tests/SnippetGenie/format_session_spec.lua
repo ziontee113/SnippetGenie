@@ -46,12 +46,14 @@ Welcome Mars. ]]
             assert.same({ 2, 1, 2, 12 }, session.holes[2].range)
 
             -- produce snippet result --
-
             local expected_snippet_body = [[
 {} Venus,
 {}. ]]
-            local result = session:produce_snippet_body()
-            assert.equals(expected_snippet_body, result)
+            assert.equals(expected_snippet_body, session:produce_snippet_body())
+            assert.same({
+                'i(1, "Hello")',
+                'i(2, "Welcome Mars")',
+            }, session:produce_snippet_nodes())
         end
     )
 
@@ -68,5 +70,8 @@ Welcome Mars. ]]
         vim.cmd("norm! ")
 
         assert.equals("Hello {} Mars. ", session:produce_snippet_body())
+        assert.same({
+            'i(1, "Venus,\nWelcome")',
+        }, session:produce_snippet_nodes())
     end)
 end)
