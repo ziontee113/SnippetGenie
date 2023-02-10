@@ -6,15 +6,16 @@ describe("format_session", function()
         vim.api.nvim_buf_delete(0, { force = true })
     end)
 
-    it(
-        "can initiate new FormatSession instance, add holes to it and produce snippet result",
-        function()
-            local original_content = [[
+    local original_content = [[
 The sun rises in the east.
 I love to drink coffee.
 
 Hello Venus,
 Welcome Mars. ]]
+
+    it(
+        "can initiate new FormatSession instance, add holes to it and produce snippet result",
+        function()
             helper.set_lines(original_content)
             vim.cmd("norm! 3jVG")
 
@@ -53,4 +54,19 @@ Welcome Mars. ]]
             assert.equals(expected_snippet_body, result)
         end
     )
+
+    it("does all of the above, with visual selection spans across multiple lines", function()
+        helper.set_lines(original_content)
+        vim.cmd("norm! 3jVG")
+        local session = module.FormatSession:new()
+
+        vim.cmd("norm! k0wvj0e")
+        session:add_hole()
+
+        assert.equals("Venus,\nWelcome", session.holes[1].content)
+        assert.same({ 1, 7, 2, 7 }, session.holes[1].range)
+        vim.cmd("norm! ")
+
+        assert.equals("Hello {} Mars. ", session:produce_snippet_body())
+    end)
 end)
