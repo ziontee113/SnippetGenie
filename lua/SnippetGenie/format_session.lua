@@ -1,5 +1,6 @@
 local lib_selection = require("SnippetGenie.lib.visual_selection")
 local lib_strings = require("SnippetGenie.lib.strings")
+local fmt = require("SnippetGenie.lib.fmt")
 
 local M = {}
 
@@ -12,6 +13,21 @@ M.FormatSession = {
 
     left_delimiter = "{",
     right_delimiter = "}",
+
+    snippet_skeleton = [[
+cs({{
+    trigger = "{trigger}",
+    nodes = fmt(
+        [=[
+{body}
+]=],
+        {{
+            {nodes}
+        }}
+),
+    target_table = snippets,
+}})
+]],
 }
 M.FormatSession.__index = M.FormatSession
 
@@ -55,7 +71,7 @@ function M.FormatSession:produce_snippet_nodes()
     local snippet_nodes = {}
 
     for i, hole in ipairs(self.holes) do
-        table.insert(snippet_nodes, string.format('i(%s, "%s")', i, hole.content))
+        table.insert(snippet_nodes, string.format('i(%s, "%s"),', i, hole.content))
     end
 
     return snippet_nodes
@@ -63,7 +79,15 @@ end
 
 function M.FormatSession:produce_final_snippet()
     local snippet_body = self:produce_snippet_body()
-    local snippet_nodes = self:produce_snippet_nodes()
+    local snippet_nodes = table.concat(self:produce_snippet_nodes(), "\n")
+
+    local final_snippet = fmt(self.snippet_skeleton, {
+        trigger = "prototyping",
+        body = snippet_body,
+        nodes = snippet_nodes,
+    }, {})
+
+    return final_snippet
 end
 
 function M.FormatSession.new()

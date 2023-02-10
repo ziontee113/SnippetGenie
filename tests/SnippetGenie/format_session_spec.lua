@@ -51,9 +51,27 @@ Welcome Mars. ]]
 {}. ]]
             assert.equals(expected_snippet_body, session:produce_snippet_body())
             assert.same({
-                'i(1, "Hello")',
-                'i(2, "Welcome Mars")',
+                'i(1, "Hello"),',
+                'i(2, "Welcome Mars"),',
             }, session:produce_snippet_nodes())
+
+            local expected_final_snippet = [[
+cs({
+    trigger = "prototyping",
+    nodes = fmt(
+        [=[
+{} Venus,
+{}. 
+]=],
+        {
+            i(1, "Hello"),
+            i(2, "Welcome Mars"),
+        }
+),
+    target_table = snippets,
+})
+]]
+            assert.equals(expected_final_snippet, session:produce_final_snippet())
         end
     )
 
@@ -71,7 +89,7 @@ Welcome Mars. ]]
 
         assert.equals("Hello {} Mars. ", session:produce_snippet_body())
         assert.same({
-            'i(1, "Venus,\nWelcome")',
+            'i(1, "Venus,\nWelcome"),',
         }, session:produce_snippet_nodes())
     end)
 end)
