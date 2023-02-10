@@ -71,7 +71,18 @@ function M.FormatSession:produce_snippet_nodes()
     local snippet_nodes = {}
 
     for i, hole in ipairs(self.holes) do
-        table.insert(snippet_nodes, string.format('i(%s, "%s"),', i, hole.content))
+        if string.find(hole.content, "\n") then
+            local splits = vim.split(hole.content, "\n")
+            for j, _ in ipairs(splits) do
+                splits[j] = string.format('"%s"', splits[j])
+            end
+            local joined = table.concat(splits, ", ")
+            hole.content = string.format("{ %s }", joined)
+
+            table.insert(snippet_nodes, string.format("i(%s, %s),", i, hole.content))
+        else
+            table.insert(snippet_nodes, string.format('i(%s, "%s"),', i, hole.content))
+        end
     end
 
     return snippet_nodes

@@ -46,15 +46,6 @@ Welcome Mars. ]]
             assert.same({ 2, 1, 2, 12 }, session.holes[2].range)
 
             -- produce snippet result --
-            local expected_snippet_body = [[
-{} Venus,
-{}. ]]
-            assert.equals(expected_snippet_body, session:produce_snippet_body())
-            assert.same({
-                'i(1, "Hello"),',
-                'i(2, "Welcome Mars"),',
-            }, session:produce_snippet_nodes())
-
             local expected_final_snippet = [[
 cs({
     trigger = "prototyping",
@@ -87,9 +78,20 @@ cs({
         assert.same({ 1, 7, 2, 7 }, session.holes[1].range)
         vim.cmd("norm! ")
 
-        assert.equals("Hello {} Mars. ", session:produce_snippet_body())
-        assert.same({
-            'i(1, "Venus,\nWelcome"),',
-        }, session:produce_snippet_nodes())
+        local expected_final_snippet = [[
+cs({
+    trigger = "prototyping",
+    nodes = fmt(
+        [=[
+Hello {} Mars. 
+]=],
+        {
+            i(1, { "Venus,", "Welcome" }),
+        }
+),
+    target_table = snippets,
+})
+]]
+        assert.equals(expected_final_snippet, session:produce_final_snippet())
     end)
 end)
