@@ -120,3 +120,19 @@ Welcome Venus]]
         assert.equals("Hello World\nWelcome", substring)
     end)
 end)
+
+describe("format_with_delimiters", function()
+    it("adds delimiters to the specified ranges", function()
+        local input = [[
+Hello World
+Welcome Venus ]]
+        local ranges = { { 1, 5 }, { 21, 25 } }
+        local delimiters = "{}"
+
+        local got = lib_strings.format_with_delimiters(input, ranges, delimiters)
+        local want = [[
+{} World
+Welcome {} ]]
+        assert.equals(want, got)
+    end)
+end)

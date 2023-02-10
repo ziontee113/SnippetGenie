@@ -29,6 +29,27 @@ end
 
 --=============== Strings Utils ===============
 
+M.format_with_delimiters = function(input, ranges, delimiters)
+    local output = ""
+    local start_index = 1
+
+    for _, range in ipairs(ranges) do
+        if #range == 4 then
+            range = M.convert_4d_range_to_2d_range(input, range)
+        end
+
+        local start_pos, end_pos = unpack(range)
+        output = output .. input:sub(start_index, start_pos - 1) .. delimiters
+        start_index = end_pos + 1
+    end
+
+    output = output .. input:sub(start_index)
+
+    return output
+end
+
+--=============== Strings Utils ===============
+
 --- Returns whether the given string is empty or consists only of whitespaces
 -- @param str (string) the string to check
 -- @return (boolean) whether the string is empty or consists only of whitespaces
