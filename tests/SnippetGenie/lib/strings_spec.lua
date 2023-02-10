@@ -135,4 +135,17 @@ Welcome Venus ]]
 Welcome {} ]]
         assert.equals(want, got)
     end)
+
+    it("adds delimiters range that spans across multiple lines", function()
+        local input = [[
+Hello World
+Welcome Venus ]]
+        local ranges = { { 7, 19 } }
+        local delimiters = "{}"
+
+        local got = lib_strings.format_with_delimiters(input, ranges, delimiters)
+        local want = [[
+Hello {} Venus ]]
+        assert.equals(want, got)
+    end)
 end)
