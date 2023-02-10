@@ -16,9 +16,8 @@ Welcome Mars. ]]
         helper.set_lines(original_content)
         vim.cmd("norm! 3jVG")
 
-        -- session creation process
+        -- session creation process --
         local session = module.FormatSession:new()
-
         local expected_content = [[
 Hello Venus,
 Welcome Mars. ]]
@@ -26,13 +25,21 @@ Welcome Mars. ]]
 
         assert.equals(expected_content, session.original_content)
         assert.equals(expected_row_offset, session.row_offset)
-
         vim.cmd("norm! ")
 
-        -- add_hole process
+        -- first hole
         vim.cmd("norm! k0ve")
         session:add_hole()
+
         assert.equals("Hello", session.holes[1].content)
-        assert.are.same({ 1, 1, 1, 5 }, session.holes[1].range)
+        assert.same({ 1, 1, 1, 5 }, session.holes[1].range)
+        vim.cmd("norm! ")
+
+        -- second hole
+        vim.cmd("norm! j0vee")
+        session:add_hole()
+
+        assert.equals("Welcome Mars", session.holes[2].content)
+        assert.same({ 2, 1, 2, 12 }, session.holes[2].range)
     end)
 end)
