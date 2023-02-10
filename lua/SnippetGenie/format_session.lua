@@ -1,4 +1,5 @@
 local lib_selection = require("SnippetGenie.lib.visual_selection")
+local lib_strings = require("SnippetGenie.lib.strings")
 
 local M = {}
 
@@ -38,6 +39,16 @@ function M.FormatSession:add_hole()
         }
         table.insert(self.holes, new_hole)
     end
+end
+
+function M.FormatSession:produce_snippet_body()
+    local ranges = {}
+    for _, hole in ipairs(self.holes) do
+        table.insert(ranges, hole.range)
+    end
+
+    local snippet_body = lib_strings.format_with_delimiters(self.original_content, ranges, "{}")
+    return snippet_body
 end
 
 function M.FormatSession.new()
