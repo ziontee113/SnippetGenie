@@ -90,3 +90,33 @@ local name = {}]]
         assert.are.same(expected, result)
     end)
 end)
+
+describe("convert_4d_range_to_2d_range", function()
+    it("handles range within a single line", function()
+        local input = "Hello World"
+        local range = { 1, 1, 1, 5 }
+        local got = lib_strings.convert_4d_range_to_2d_range(input, range)
+        local start_pos, end_pos = unpack(got)
+
+        local want = { 1, 5 }
+        assert.same(want, got)
+
+        local substring = string.sub(input, start_pos, end_pos)
+        assert.equals("Hello", substring)
+    end)
+
+    it("handles range that spans across multiple lines", function()
+        local input = [[
+Hello World
+Welcome Venus]]
+        local range = { 1, 1, 2, 7 }
+        local got = lib_strings.convert_4d_range_to_2d_range(input, range)
+        local start_pos, end_pos = unpack(got)
+
+        local want = { 1, 19 }
+        assert.same(want, got)
+
+        local substring = string.sub(input, start_pos, end_pos)
+        assert.equals("Hello World\nWelcome", substring)
+    end)
+end)
