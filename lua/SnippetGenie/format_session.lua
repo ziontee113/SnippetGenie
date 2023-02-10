@@ -14,6 +14,7 @@ M.FormatSession = {
     left_delimiter = "{",
     right_delimiter = "}",
 
+    trigger = "myTrigger",
     snippet_skeleton = [[
 cs({{
     trigger = "{trigger}",
@@ -31,7 +32,12 @@ cs({{
 }
 M.FormatSession.__index = M.FormatSession
 
-function M.FormatSession:initiate_original_values()
+function M.FormatSession:initiate_original_values(opts)
+    opts = opts or {}
+    for key, value in pairs(opts) do
+        self[key] = value
+    end
+
     self.original_content = lib_selection.get_selection_text()
     self.row_offset = lib_selection.get_visual_range()
     self.original_buffer = vim.api.nvim_get_current_buf()
@@ -73,8 +79,8 @@ function M.FormatSession:produce_snippet_nodes()
     for i, hole in ipairs(self.holes) do
         if string.find(hole.content, "\n") then
             local splits = vim.split(hole.content, "\n")
-            for j, _ in ipairs(splits) do
-                splits[j] = string.format('"%s"', splits[j])
+            for j, split in ipairs(splits) do
+                splits[j] = string.format('"%s"', split)
             end
             local joined = table.concat(splits, ", ")
             hole.content = string.format("{ %s }", joined)
@@ -93,7 +99,7 @@ function M.FormatSession:produce_final_snippet()
     local snippet_nodes = table.concat(self:produce_snippet_nodes(), "\n")
 
     local final_snippet = fmt(self.snippet_skeleton, {
-        trigger = "prototyping",
+        trigger = self.trigger,
         body = snippet_body,
         nodes = snippet_nodes,
     }, {})
@@ -101,10 +107,10 @@ function M.FormatSession:produce_final_snippet()
     return final_snippet
 end
 
-function M.FormatSession.new()
+function M.FormatSession:new(opts)
     local session = vim.deepcopy(M.FormatSession)
 
-    session:initiate_original_values()
+    session:initiate_original_values(opts)
 
     return session
 end

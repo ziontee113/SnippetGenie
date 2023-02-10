@@ -48,7 +48,7 @@ Welcome Mars. ]]
             -- produce snippet result --
             local expected_final_snippet = [[
 cs({
-    trigger = "prototyping",
+    trigger = "myTrigger",
     nodes = fmt(
         [=[
 {} Venus,
@@ -69,7 +69,7 @@ cs({
     it("does all of the above, with visual selection spans across multiple lines", function()
         helper.set_lines(original_content)
         vim.cmd("norm! 3jVG")
-        local session = module.FormatSession:new()
+        local session = module.FormatSession:new({ trigger = "customTrigger" })
 
         vim.cmd("norm! k0wvj0e")
         session:add_hole()
@@ -80,7 +80,7 @@ cs({
 
         local expected_final_snippet = [[
 cs({
-    trigger = "prototyping",
+    trigger = "customTrigger",
     nodes = fmt(
         [=[
 Hello {} Mars. 
