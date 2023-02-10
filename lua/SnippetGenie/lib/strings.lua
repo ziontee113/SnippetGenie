@@ -2,6 +2,9 @@ local M = {}
 
 --=============== Lua Convert Multi-Line Range ===============
 
+---finds positions of newline characters in the input string
+---@param input string
+---@return table
 local get_new_line_positions = function(input)
     local new_line_positons = { 0 }
 
@@ -17,6 +20,9 @@ local get_new_line_positions = function(input)
     return new_line_positons
 end
 
+---@param input string
+---@param range table: `{start row, start col, end row, end col}`
+---@return table: `{start position, end position}`
 M.convert_4d_range_to_2d_range = function(input, range)
     local new_line_positons = get_new_line_positions(input)
     local start_row, start_col, end_row, end_col = unpack(range)
@@ -27,8 +33,13 @@ M.convert_4d_range_to_2d_range = function(input, range)
     return { start_pos, end_pos }
 end
 
---=============== Strings Utils ===============
+--=============== Format With Delimiters ===============
 
+--- Formats the input string with the given delimiters at specific ranges.
+---@param input string: the input string to be formatted.
+---@param ranges table: array of ranges in the form of `{start_pos, end_pos}`. The delimiters will be inserted at these ranges.
+---@param delimiters string: the string to be used as the delimiters.
+---@return string: formatted string with the delimiters inserted at the specified ranges.
 M.format_with_delimiters = function(input, ranges, delimiters)
     local output = ""
     local start_index = 1
