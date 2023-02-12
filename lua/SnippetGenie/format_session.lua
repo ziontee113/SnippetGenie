@@ -106,10 +106,10 @@ function M.FormatSession:set_trigger(trigger)
     self.trigger = trigger
 end
 
-function M.FormatSession:new(opts)
+function M.FormatSession:new()
     local session = vim.deepcopy(M.FormatSession)
 
-    session:initiate_original_values(opts)
+    session:initiate_original_values()
 
     return session
 end
