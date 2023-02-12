@@ -7,6 +7,7 @@ local M = {}
 M.FormatSession = {
     original_buffer = nil,
     original_content = nil,
+    initial_mode = nil,
 
     row_offset = nil,
     col_offset = nil,
@@ -49,6 +50,7 @@ function M.FormatSession:initiate_original_values(opts)
     self.original_buffer = vim.api.nvim_get_current_buf()
 
     self.row_offset, self.col_offset = lib_selection.get_visual_range()
+    self.initial_mode = vim.fn.mode()
 end
 
 local mutate_range_with_offset = function(
@@ -106,6 +108,19 @@ function M.FormatSession:produce_snippet_body()
 
     snippet_body = string.gsub(snippet_body, self.special_left_delimiter, self.left_delimiter)
     snippet_body = string.gsub(snippet_body, self.special_right_delimiter, self.right_delimiter)
+
+    if self.initial_mode == "v" then
+        local lines = vim.split(snippet_body, "\n")
+        local first_line = table.remove(lines, 1)
+
+        local dedented_lines = lib_strings.dedent(lines)
+
+        ---@diagnostic disable-next-line: param-type-mismatch
+        table.insert(dedented_lines, 1, first_line)
+
+        ---@diagnostic disable-next-line: param-type-mismatch
+        snippet_body = table.concat(dedented_lines, "\n")
+    end
 
     return snippet_body
 end
