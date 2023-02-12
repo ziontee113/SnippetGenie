@@ -14,7 +14,8 @@ M.FormatSession = {
     left_delimiter = "{",
     right_delimiter = "}",
 
-    -- HACK:
+    -- HACK: we use these characters because both `\a` and `\f` are 1 byte
+    -- which Lua counts as `1` in `#length`
     special_left_delimiter = "\a",
     special_right_delimiter = "\f",
 

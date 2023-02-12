@@ -1,11 +1,15 @@
 local M = {}
 
+-- TODO: handle indentation, dedent, etc...
+-- if we use `v` instead of `V`, the content and the placeholders are out of sync
+
 local module = require("SnippetGenie.format_session")
 
 local current_session
 local user_options = {
     regex = [[-\+ Snippets goes here]],
     snippets_directory = "/home/ziontee113/.config/nvim/snippets/",
+    file_name = "generated",
 }
 
 local create_new_snippet_or_add_placeholder = function()
@@ -17,7 +21,11 @@ local create_new_snippet_or_add_placeholder = function()
 end
 
 local write_snippet_to_file = function(snippet_string)
-    local file_path = user_options.snippets_directory .. user_options.filetype .. "/generated.lua"
+    local file_path = user_options.snippets_directory
+        .. user_options.filetype
+        .. "/"
+        .. user_options.file_name
+        .. ".lua"
     local old_lines = vim.fn.readfile(file_path)
     local regex = vim.regex(user_options.regex)
     local target_line
