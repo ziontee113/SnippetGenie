@@ -129,4 +129,40 @@ I love to drink coffee.
 ]]
         assert.equals(expected_final_snippet, session:produce_final_snippet())
     end)
+
+    it("initial visual selection is `v` and does not start at start of line", function()
+        local content = [[
+{ The sun rises in the east. }
+I love to drink coffee.]]
+
+        helper.set_lines(content)
+
+        -- new FormatSession with `The sun` as content
+        vim.cmd("norm! fTvee") -- select `The sun`
+        local session = module.FormatSession:new()
+
+        -- add `sun` as a placeholder (hole)
+        vim.cmd("norm! 0fse") -- select `sun`
+        session:add_hole()
+
+        assert.equals("sun", session.holes[1].content)
+        assert.same({ 1, 7, 1, 9 }, session.holes[1].range)
+        vim.cmd("norm! ")
+
+        local expected_final_snippet = [[
+cs({
+    trigger = "myTrigger",
+    nodes = fmt(
+        [=[
+The {}
+]=],
+        {
+            i(1, "sun"),
+        }
+),
+    target_table = snippets,
+})
+]]
+        assert.equals(expected_final_snippet, session:produce_final_snippet())
+    end)
 end)
