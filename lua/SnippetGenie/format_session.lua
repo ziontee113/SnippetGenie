@@ -7,7 +7,9 @@ local M = {}
 M.FormatSession = {
     original_buffer = nil,
     original_content = nil,
+
     row_offset = nil,
+    col_offset = nil,
 
     holes = {},
 
@@ -44,21 +46,35 @@ function M.FormatSession:initiate_original_values(opts)
     end
 
     self.original_content = lib_selection.get_selection_text()
-    self.row_offset = lib_selection.get_visual_range()
     self.original_buffer = vim.api.nvim_get_current_buf()
+
+    self.row_offset, self.col_offset = lib_selection.get_visual_range()
 end
 
-local mutate_range_with_offet = function(offset, start_row, start_col, end_row, end_col)
-    end_row = end_row - offset + 1
-    start_row = start_row - offset + 1
+local mutate_range_with_offset = function(
+    row_offset,
+    col_offset,
+    start_row,
+    start_col,
+    end_row,
+    end_col
+)
+    end_row = end_row - row_offset + 1
+    start_row = start_row - row_offset + 1
+
+    end_col = end_col - col_offset + 1
+    start_col = start_col - col_offset + 1
 
     return { start_row, start_col, end_row, end_col }
 end
 
 function M.FormatSession:add_hole()
     if vim.api.nvim_get_current_buf() == self.original_buffer then
-        local mutated_range =
-            mutate_range_with_offet(self.row_offset, lib_selection.get_visual_range())
+        local mutated_range = mutate_range_with_offset(
+            self.row_offset,
+            self.col_offset,
+            lib_selection.get_visual_range()
+        )
 
         local new_hole = {
             content = lib_selection.get_selection_text(),

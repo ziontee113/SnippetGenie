@@ -142,11 +142,11 @@ I love to drink coffee.]]
         local session = module.FormatSession:new()
 
         -- add `sun` as a placeholder (hole)
-        vim.cmd("norm! 0fse") -- select `sun`
+        vim.cmd("norm! 0fsve") -- select `sun`
         session:add_hole()
 
         assert.equals("sun", session.holes[1].content)
-        assert.same({ 1, 7, 1, 9 }, session.holes[1].range)
+        assert.same({ 1, 5, 1, 7 }, session.holes[1].range)
         vim.cmd("norm! ")
 
         local expected_final_snippet = [[
