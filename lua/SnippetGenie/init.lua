@@ -1,8 +1,5 @@
 local M = {}
 
--- TODO: handle indentation, dedent, etc...
--- if we use `v` instead of `V`, the content and the placeholders are out of sync
-
 local module = require("SnippetGenie.format_session")
 
 local current_session
