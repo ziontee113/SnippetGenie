@@ -165,4 +165,57 @@ The {}
 ]]
         assert.equals(expected_final_snippet, session:produce_final_snippet())
     end)
+
+    it(
+        "initial selection is `v`, does not start at start of line, spans across multiple lines",
+        function()
+            local content = [[
+function myfunc()
+    if condition then
+        action
+    end
+end
+]]
+            helper.set_lines(content)
+
+            -- new FormatSession with if statement as content
+            vim.cmd("norm! j0wvjj0fd")
+            local session = module.FormatSession:new()
+
+            -- add `condition` as a placeholder (hole)
+            vim.cmd("norm! kk0fcve") -- select `condition`
+            session:add_hole()
+
+            assert.equals("condition", session.holes[1].content)
+            assert.same({ 1, 4, 1, 12 }, session.holes[1].range)
+            vim.cmd("norm! ")
+
+            -- add `action` as a placeholder (hole)
+            vim.cmd("norm! j0fave") -- select `action`
+            session:add_hole()
+
+            assert.equals("action", session.holes[2].content)
+            assert.same({ 2, 9, 2, 14 }, session.holes[2].range)
+            vim.cmd("norm! ")
+
+            local expected_final_snippet = [[
+cs({
+    trigger = "myTrigger",
+    nodes = fmt(
+        [=[
+if {} then
+    {}
+end
+]=],
+        {
+            i(1, "condition"),
+            i(2, "action"),
+        }
+),
+    target_table = snippets,
+})
+]]
+            assert.equals(expected_final_snippet, session:produce_final_snippet())
+        end
+    )
 end)

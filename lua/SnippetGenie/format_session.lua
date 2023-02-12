@@ -62,8 +62,10 @@ local mutate_range_with_offset = function(
     end_row = end_row - row_offset + 1
     start_row = start_row - row_offset + 1
 
-    end_col = end_col - col_offset + 1
-    start_col = start_col - col_offset + 1
+    if start_row == 1 then
+        end_col = end_col - col_offset + 1
+        start_col = start_col - col_offset + 1
+    end
 
     return { start_row, start_col, end_row, end_col }
 end
