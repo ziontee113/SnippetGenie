@@ -69,7 +69,7 @@ cs({
     it("does all of the above, with visual selection spans across multiple lines", function()
         helper.set_lines(original_content)
         vim.cmd("norm! 3jVG")
-        local session = module.FormatSession:new({ trigger = "customTrigger" })
+        local session = module.FormatSession:new()
 
         vim.cmd("norm! k0wvj0e")
         session:add_hole()
@@ -92,6 +92,7 @@ Hello {} Mars.
     target_table = snippets,
 })
 ]]
+        session:set_trigger("customTrigger")
         assert.equals(expected_final_snippet, session:produce_final_snippet())
     end)
 end)

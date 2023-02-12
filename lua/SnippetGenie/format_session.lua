@@ -32,12 +32,7 @@ cs({{
 }
 M.FormatSession.__index = M.FormatSession
 
-function M.FormatSession:initiate_original_values(opts)
-    opts = opts or {}
-    for key, value in pairs(opts) do
-        self[key] = value
-    end
-
+function M.FormatSession:initiate_original_values()
     self.original_content = lib_selection.get_selection_text()
     self.row_offset = lib_selection.get_visual_range()
     self.original_buffer = vim.api.nvim_get_current_buf()
@@ -105,6 +100,10 @@ function M.FormatSession:produce_final_snippet()
     }, {})
 
     return final_snippet
+end
+
+function M.FormatSession:set_trigger(trigger)
+    self.trigger = trigger
 end
 
 function M.FormatSession:new(opts)
