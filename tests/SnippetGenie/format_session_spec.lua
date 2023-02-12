@@ -95,4 +95,38 @@ Hello {} Mars.
         session:set_trigger("customTrigger")
         assert.equals(expected_final_snippet, session:produce_final_snippet())
     end)
+
+    it("does all of the above, with visual selection spans across multiple lines", function()
+        local content = [[
+{ The sun rises in the east. }
+I love to drink coffee.]]
+
+        helper.set_lines(content)
+        vim.cmd("norm! ggVG")
+        local session = module.FormatSession:new()
+
+        vim.cmd("norm! gg0fTve")
+        session:add_hole()
+
+        assert.equals("The", session.holes[1].content)
+        assert.same({ 1, 3, 1, 5 }, session.holes[1].range)
+        vim.cmd("norm! ")
+
+        local expected_final_snippet = [[
+cs({
+    trigger = "myTrigger",
+    nodes = fmt(
+        [=[
+{{ {} sun rises in the east. }}
+I love to drink coffee.
+]=],
+        {
+            i(1, "The"),
+        }
+),
+    target_table = snippets,
+})
+]]
+        assert.equals(expected_final_snippet, session:produce_final_snippet())
+    end)
 end)

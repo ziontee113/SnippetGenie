@@ -14,6 +14,10 @@ M.FormatSession = {
     left_delimiter = "{",
     right_delimiter = "}",
 
+    -- HACK:
+    special_left_delimiter = "\a",
+    special_right_delimiter = "\f",
+
     trigger = "myTrigger",
     snippet_skeleton = [[
 cs({{
@@ -69,8 +73,28 @@ function M.FormatSession:produce_snippet_body()
         table.insert(ranges, hole.range)
     end
 
-    local snippet_body = lib_strings.format_with_delimiters(self.original_content, ranges, "{}")
+    -- HACK:
+    local snippet_body = lib_strings.format_with_delimiters(
+        self.original_content,
+        ranges,
+        self.special_left_delimiter .. self.special_right_delimiter
+    )
+
+    snippet_body =
+        string.gsub(snippet_body, self.left_delimiter, string.rep(self.left_delimiter, 2))
+    snippet_body =
+        string.gsub(snippet_body, self.right_delimiter, string.rep(self.right_delimiter, 2))
+
+    snippet_body = string.gsub(snippet_body, self.special_left_delimiter, self.left_delimiter)
+    snippet_body = string.gsub(snippet_body, self.special_right_delimiter, self.right_delimiter)
+
     return snippet_body
+end
+
+local escape_special_characters = function(input)
+    input = string.gsub(input, '"', '\\"')
+    input = string.gsub(input, "\\", '\\\\"')
+    return input
 end
 
 function M.FormatSession:produce_snippet_nodes()
@@ -78,6 +102,8 @@ function M.FormatSession:produce_snippet_nodes()
 
     for i, hole in ipairs(self.holes) do
         if string.find(hole.content, "\n") then
+            hole.content = escape_special_characters(hole.content)
+
             local splits = vim.split(hole.content, "\n")
             for j, split in ipairs(splits) do
                 splits[j] = string.format('"%s"', split)
