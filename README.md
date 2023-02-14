@@ -144,3 +144,8 @@ local autosnippets = {}
 
 return snippets, autosnippets
 ```
+
+## Get involved in the development process 
+
+Feedback is always appreciated. If you encounter any issues or have suggestions for improving the plugin,
+please feel free to open an issue or pull request. One of the key goals is to make the plugin as user-friendly as possible.
