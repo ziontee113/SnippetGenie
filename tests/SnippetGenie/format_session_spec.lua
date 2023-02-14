@@ -217,4 +217,51 @@ end
 ]]
         assert.equals(expected_final_snippet, session:produce_final_snippet())
     end)
+
+    it("escapes backslashes and double quotes", function()
+        local content = [[
+function myfunc()
+    if name == "John" then
+        -- \testing backslashes\
+    end
+end
+]]
+        helper.set_lines(content)
+
+        vim.cmd("norm! ggjVjj")
+        local session = module.FormatSession:new()
+
+        -- add `John` as a placeholder (hole)
+        vim.cmd('norm! ggj0f"vf"') -- select `John`
+        session:add_hole()
+
+        assert.equals('"John"', session.holes[1].content)
+        vim.cmd("norm! ")
+
+        -- add `-- \testing backslashes\` as a placeholder (hole)
+        vim.cmd("norm! j0f-vf\\;")
+        session:add_hole()
+
+        assert.equals([[-- \testing backslashes\]], session.holes[2].content)
+        vim.cmd("norm! ")
+
+        local expected_final_snippet = [[
+cs({
+    trigger = "myTrigger",
+    nodes = fmt(
+        [=[
+    if name == {} then
+        {}
+    end
+]=],
+        {
+            i(1, "\"John\""),
+            i(2, "-- \\testing backslashes\\"),
+        }
+),
+    target_table = snippets,
+})
+]]
+        assert.equals(expected_final_snippet, session:produce_final_snippet())
+    end)
 end)

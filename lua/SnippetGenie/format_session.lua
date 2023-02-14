@@ -126,8 +126,8 @@ function M.FormatSession:produce_snippet_body()
 end
 
 local escape_special_characters = function(input)
+    input = string.gsub(input, "\\", "\\\\")
     input = string.gsub(input, '"', '\\"')
-    input = string.gsub(input, "\\", '\\\\"')
     return input
 end
 
@@ -135,9 +135,9 @@ function M.FormatSession:produce_snippet_nodes()
     local snippet_nodes = {}
 
     for i, hole in ipairs(self.holes) do
-        if string.find(hole.content, "\n") then
-            hole.content = escape_special_characters(hole.content)
+        hole.content = escape_special_characters(hole.content)
 
+        if string.find(hole.content, "\n") then
             local splits = vim.split(hole.content, "\n")
             for j, split in ipairs(splits) do
                 splits[j] = string.format('"%s"', split)
