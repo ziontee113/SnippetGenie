@@ -10,7 +10,9 @@ Work in Progress
 return {
     "ziontee113/SnippetGenie",
     config = function()
-        require("SnippetGenie").setup({
+        local genie = require("SnippetGenie")
+
+        genie.setup({
             -- SnippetGenie will use this regex to find the pattern in your snippet file,
             -- and insert the newly generated snippet there.
             regex = [[-\+ Snippets goes here]],
@@ -38,6 +40,17 @@ s(
 ),
 ]],
         })
+
+        -- SnippetGenie doesn't map any keys by default.
+        -- Here're the suggested mappings:
+        vim.keymap.set("x", "<CR>", function()
+            genie.create_new_snippet_or_add_placeholder()
+            vim.cmd("norm! ") -- exit Visual Mode, go back to Normal Mode
+        end, {})
+
+        vim.keymap.set("n", "<CR>", function()
+            genie.finalize_snippet()
+        end, {})
     end,
 }
 ```
