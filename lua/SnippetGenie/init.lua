@@ -9,7 +9,7 @@ local user_options = {
     file_name = "generated",
 }
 
-local create_new_snippet_or_add_placeholder = function()
+M.create_new_snippet_or_add_placeholder = function()
     if not current_session then
         current_session = module.FormatSession:new(user_options)
     else
@@ -54,7 +54,7 @@ local write_snippet_to_file = function(snippet_string)
     end
 end
 
-local finalize_snippet = function()
+M.finalize_snippet = function()
     if current_session then
         -- TODO: move this somewhere else cleaner
         user_options.filetype = vim.bo.ft
@@ -75,16 +75,6 @@ end
 M.setup = function(opts)
     user_options = vim.tbl_deep_extend("force", user_options, opts)
 end
-
-vim.keymap.set("x", "<CR>", function()
-    create_new_snippet_or_add_placeholder()
-
-    vim.cmd("norm! ")
-end, {})
-
-vim.keymap.set("n", "<CR>", function()
-    finalize_snippet()
-end, {})
 
 return M
 
