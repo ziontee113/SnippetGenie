@@ -4,6 +4,10 @@ A Neovim plugin that aims to simplify the process of creating LuaSnip Snippets.
 <!-- Say goodbye to manually creating snippets and hello to increased productivity. -->
 <!-- Get started with the easy-to-use plugin today. -->
 
+
+https://user-images.githubusercontent.com/102876811/218838598-b12c73c9-3863-4db4-a08b-c8cccf43348d.mp4
+
+
 ## Installation:
 
 `Lazy.nvim` example:
