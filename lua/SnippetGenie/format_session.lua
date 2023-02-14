@@ -24,18 +24,14 @@ M.FormatSession = {
 
     trigger = "myTrigger",
     snippet_skeleton = [[
-cs({{
-    trigger = "{trigger}",
-    nodes = fmt(
-        [=[
+s(
+    "{trigger}",
+    fmt([=[
 {body}
-]=],
-        {{
-            {nodes}
-        }}
+]=], {{
+        {nodes}
+    }})
 ),
-    target_table = snippets,
-}})
 ]],
 }
 M.FormatSession.__index = M.FormatSession
