@@ -11,6 +11,7 @@ M.FormatSession = {
 
     row_offset = nil,
     col_offset = nil,
+    smallest_indent = nil,
 
     holes = {},
 
@@ -118,6 +119,9 @@ function M.FormatSession:produce_snippet_body()
         snippet_body = table.concat(dedented_lines, "\n")
     end
 
+    self.smallest_indent = lib_strings.get_smallest_indent(vim.split(self.original_content, "\n"))
+    snippet_body = lib_strings.dedent_by(snippet_body, self.smallest_indent)
+
     return snippet_body
 end
 
@@ -132,6 +136,7 @@ function M.FormatSession:produce_snippet_nodes()
 
     for i, hole in ipairs(self.holes) do
         hole.content = escape_special_characters(hole.content)
+        hole.content = lib_strings.dedent_by(hole.content, self.smallest_indent)
 
         if string.find(hole.content, "\n") then
             local splits = vim.split(hole.content, "\n")

@@ -71,18 +71,35 @@ end
 --- Returns the length of the smallest common indentation of the given lines
 -- @param lines (table of strings) an array of strings representing the lines to dedent
 -- @return (number) the length of the smallest common indentation
-local function get_smallest_indent(lines)
+M.get_smallest_indent = function(lines, ignore_line)
     local smallest_indent = math.huge
     for _, line in ipairs(lines) do
         local og_len = #line
         local trimmed = string.gsub(line, "^ +", "")
         local trimmed_len = #trimmed
         local spaces_len = og_len - trimmed_len
-        if not M.if_string_empty(line) and (spaces_len < smallest_indent) then
+        if
+            not M.if_string_empty(line)
+            and (spaces_len < smallest_indent)
+            and (line ~= ignore_line)
+        then
             smallest_indent = spaces_len
         end
     end
     return smallest_indent
+end
+
+M.dedent_by = function(input, dedent_value)
+    local lines = vim.split(input, "\n")
+    local pattern = "^" .. string.rep(" ", dedent_value)
+
+    local new_lines = {}
+    for _, line in ipairs(lines) do
+        local new_line = string.gsub(line, pattern, "")
+        table.insert(new_lines, new_line)
+    end
+
+    return table.concat(new_lines, "\n")
 end
 
 --- Dedents the input by removing the smallest common indentation from each line
@@ -96,7 +113,7 @@ M.dedent = function(input)
         lines = vim.split(input, "\n")
     end
 
-    local smallest_indent = get_smallest_indent(lines)
+    local smallest_indent = M.get_smallest_indent(lines)
     local pattern = "^" .. string.rep(" ", smallest_indent)
     local new_lines = {}
     for _, line in ipairs(lines) do

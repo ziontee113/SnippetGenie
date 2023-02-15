@@ -267,13 +267,79 @@ cs({
     trigger = "myTrigger",
     nodes = fmt(
         [=[
-    if name == {} then
-        {}
-    end
+if name == {} then
+    {}
+end
 ]=],
         {
             i(1, "\"John\""),
             i(2, "-- \\testing backslashes\\"),
+        }
+),
+    target_table = snippets,
+})
+]]
+        assert.equals(expected_final_snippet, session:produce_final_snippet())
+    end)
+
+    it("works on this case ........", function()
+        local content = [[
+local function my_func()
+    if self.initial_mode == "v" then
+        local lines = vim.split(snippet_body, "\n")
+        local first_line = table.remove(lines, 1)
+
+        local dedented_lines = lib_strings.dedent(lines)
+
+        ---@diagnostic disable-next-line: param-type-mismatch
+        table.insert(dedented_lines, 1, first_line)
+
+        ---@diagnostic disable-next-line: param-type-mismatch
+        snippet_body = table.concat(dedented_lines, "\n")
+    end
+end
+]]
+        helper.set_lines(content)
+
+        vim.cmd("norm! ggjVG2k")
+        local session = module.FormatSession:new(user_opts)
+
+        vim.cmd("norm! gg7jV")
+        session:add_hole()
+        assert.equals(
+            "        ---@diagnostic disable-next-line: param-type-mismatch",
+            session.holes[1].content
+        )
+
+        vim.cmd("norm! G4kV")
+        session:add_hole()
+
+        assert.equals(
+            "        ---@diagnostic disable-next-line: param-type-mismatch",
+            session.holes[2].content
+        )
+
+        local expected_final_snippet = [[
+cs({
+    trigger = "myTrigger",
+    nodes = fmt(
+        [=[
+if self.initial_mode == "v" then
+    local lines = vim.split(snippet_body, "\n")
+    local first_line = table.remove(lines, 1)
+
+    local dedented_lines = lib_strings.dedent(lines)
+
+{}
+    table.insert(dedented_lines, 1, first_line)
+
+{}
+    snippet_body = table.concat(dedented_lines, "\n")
+end
+]=],
+        {
+            i(1, "    ---@diagnostic disable-next-line: param-type-mismatch"),
+            i(2, "    ---@diagnostic disable-next-line: param-type-mismatch"),
         }
 ),
     target_table = snippets,
