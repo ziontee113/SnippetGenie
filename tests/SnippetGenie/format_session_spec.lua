@@ -1,6 +1,23 @@
 local module = require("SnippetGenie.format_session")
 local helper = require("SnippetGenie.test_lib.helpers")
 
+local user_opts = {
+    snippet_skeleton = [[
+cs({{
+    trigger = "{trigger}",
+    nodes = fmt(
+        [=[
+{body}
+]=],
+        {{
+            {nodes}
+        }}
+),
+    target_table = snippets,
+}})
+]],
+}
+
 describe("format_session", function()
     after_each(function()
         vim.api.nvim_buf_delete(0, { force = true })
@@ -17,7 +34,7 @@ Welcome Mars. ]]
         vim.cmd("norm! 3jVG")
 
         -- session creation process --
-        local session = module.FormatSession:new()
+        local session = module.FormatSession:new(user_opts)
         local expected_content = [[
 Hello Venus,
 Welcome Mars. ]]
@@ -71,7 +88,7 @@ Hello Venus,
 Welcome Mars. ]]
         helper.set_lines(content)
         vim.cmd("norm! 3jVG")
-        local session = module.FormatSession:new()
+        local session = module.FormatSession:new(user_opts)
 
         vim.cmd("norm! k0wvj0e")
         session:add_hole()
@@ -105,7 +122,7 @@ I love to drink coffee.]]
 
         helper.set_lines(content)
         vim.cmd("norm! ggVG")
-        local session = module.FormatSession:new()
+        local session = module.FormatSession:new(user_opts)
 
         vim.cmd("norm! gg0fTve")
         session:add_hole()
@@ -141,7 +158,7 @@ I love to drink coffee.]]
 
         -- new FormatSession with `The sun` as content
         vim.cmd("norm! fTvee") -- select `The sun`
-        local session = module.FormatSession:new()
+        local session = module.FormatSession:new(user_opts)
 
         -- add `sun` as a placeholder (hole)
         vim.cmd("norm! 0fsve") -- select `sun`
@@ -180,7 +197,7 @@ end
 
         -- new FormatSession with if statement as content
         vim.cmd("norm! j0wvjj0fd")
-        local session = module.FormatSession:new()
+        local session = module.FormatSession:new(user_opts)
 
         -- add `condition` as a placeholder (hole)
         vim.cmd("norm! kk0fcve") -- select `condition`
@@ -229,7 +246,7 @@ end
         helper.set_lines(content)
 
         vim.cmd("norm! ggjVjj")
-        local session = module.FormatSession:new()
+        local session = module.FormatSession:new(user_opts)
 
         -- add `John` as a placeholder (hole)
         vim.cmd('norm! ggj0f"vf"') -- select `John`
