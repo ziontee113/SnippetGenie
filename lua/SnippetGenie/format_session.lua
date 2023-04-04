@@ -168,6 +168,23 @@ function M.FormatSession:produce_final_snippet()
     return final_snippet
 end
 
+function M.FormatSession:neo_produce_final_snippet(extended_arguments)
+    local snippet_body = self:produce_snippet_body()
+    local snippet_nodes = table.concat(self:produce_snippet_nodes(), "\n")
+
+    local argument_table = {
+        body = snippet_body,
+        nodes = snippet_nodes,
+    }
+    for key, value in pairs(extended_arguments) do
+        argument_table[key] = value
+    end
+
+    local final_snippet = fmt(self.snippet_skeleton, argument_table, {})
+
+    return final_snippet
+end
+
 function M.FormatSession:set_trigger(trigger)
     self.trigger = trigger
 end
