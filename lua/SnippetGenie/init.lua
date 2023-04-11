@@ -76,6 +76,8 @@ M.finalize_snippet = function()
 end
 
 M.neo_finalize_snippet = function()
+    local file_extension = vim.fn.expand("%:e")
+
     if current_session then
         user_options.filetype = vim.bo.ft
         local buf = vim.api.nvim_create_buf(false, true)
@@ -91,10 +93,20 @@ M.neo_finalize_snippet = function()
                 vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
 
                 for i, param in ipairs(user_options.parameters) do
-                    local _, _ = pcall(vim.api.nvim_buf_set_extmark, buf, ns, i - 1, 0, {
+                    local ok, _ = pcall(vim.api.nvim_buf_set_extmark, buf, ns, i - 1, 0, {
                         virt_text = { { param, user_options.parameters_hl_groups[i] or "Normal" } },
                         virt_text_pos = "eol",
                     })
+
+                    if ok and i == 3 then
+                        vim.api.nvim_buf_set_lines(buf, 2, -1, false, { "*." .. file_extension })
+                        vim.api.nvim_buf_set_extmark(buf, ns, i - 1, 0, {
+                            virt_text = {
+                                { param, user_options.parameters_hl_groups[i] or "Normal" },
+                            },
+                            virt_text_pos = "eol",
+                        })
+                    end
                 end
             end,
         })
