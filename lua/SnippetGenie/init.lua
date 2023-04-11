@@ -124,7 +124,7 @@ M.neo_finalize_snippet = function()
         local win = vim.api.nvim_open_win(buf, true, open_win_opts)
         vim.api.nvim_input("i")
 
-        vim.keymap.set("n", "<CR>", function()
+        vim.keymap.set({ "n", "i" }, "<CR>", function()
             local parameters_with_values = {}
 
             local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
@@ -146,6 +146,8 @@ M.neo_finalize_snippet = function()
             write_snippet_to_file(snippet_string)
             current_session = nil
             vim.api.nvim_win_close(win, true)
+
+            vim.cmd("stopinsert")
         end, { buffer = buf, silent = true })
     end
 end
