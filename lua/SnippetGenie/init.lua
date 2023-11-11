@@ -21,13 +21,50 @@ M.create_new_snippet_or_add_placeholder = function()
     end
 end
 
+local skeleton_template = [[
+---@diagnostic disable: undefined-global
+---@diagnostic disable-next-line: unused-local
+local snippets, autosnippets = {}, {}
+local luasnip_utils = require("special.luasnip-utils")
+local cs = luasnip_utils.create_snippet
+local pattern = "*.%s"
+
+-------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------- Snippets goes here
+
+return snippets, autosnippets
+]]
+
+local make_skeleton_file = function()
+    local file_dir = string.format("%s%s", user_options.snippets_directory, user_options.filetype)
+    local file_name = string.format("%s/%s.lua", file_dir, user_options.file_name)
+    local file_contents = string.format(skeleton_template, user_options.file_extension)
+
+    vim.fn.jobstart(string.format("mkdir -p %s", file_dir))
+
+    local write_cmd = string.format("echo %s > %s", vim.fn.shellescape(file_contents), file_name)
+    vim.fn.jobstart(write_cmd)
+
+    print("new snippet file has been created, please restart Neovim.")
+
+    return file_contents
+end
+
 local write_snippet_to_file = function(snippet_string)
     local file_path = user_options.snippets_directory
         .. user_options.filetype
         .. "/"
         .. user_options.file_name
         .. ".lua"
-    local old_lines = vim.fn.readfile(file_path)
+
+    local ok, old_lines = pcall(vim.fn.readfile, file_path)
+
+    if not ok then
+        old_lines = vim.split(make_skeleton_file(), "\n")
+    end
+
     local regex = vim.regex(user_options.regex)
     local target_line
 
@@ -53,8 +90,10 @@ local write_snippet_to_file = function(snippet_string)
             table.insert(new_lines, line)
         end
 
-        vim.fn.writefile(new_lines, file_path)
-        require("luasnip.loaders").reload_file(vim.fn.expand(file_path)) -- hot reloading with LuaSnip
+        vim.schedule(function()
+            vim.fn.writefile(new_lines, file_path)
+            require("luasnip.loaders").reload_file(vim.fn.expand(file_path)) -- hot reloading with LuaSnip
+        end)
     end
 end
 
@@ -80,6 +119,8 @@ M.neo_finalize_snippet = function()
 
     if current_session then
         user_options.filetype = vim.bo.ft
+        user_options.file_extension = file_extension
+
         local buf = vim.api.nvim_create_buf(false, true)
         vim.api.nvim_buf_set_option(buf, "filetype", "snippet_genie_prompt")
         vim.api.nvim_buf_set_option(buf, "bufhidden", "delete")
