@@ -92,7 +92,6 @@ local write_snippet_to_file = function(snippet_string)
 
         vim.schedule(function()
             vim.fn.writefile(new_lines, file_path)
-            require("luasnip.loaders").reload_file(vim.fn.expand(file_path)) -- hot reloading with LuaSnip
         end)
     end
 end
